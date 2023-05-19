@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import NextAuthSessionProvider from "@/components/NextAuthSessionProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -12,13 +13,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="main">
-          <div className="gradient" />
-        </div>
-        <main className="app">
-          <Navbar />
-          {children}
-        </main>
+        <NextAuthSessionProvider>
+          <div className="main">
+            <div className="gradient" />
+          </div>
+          <main className="app">
+            <Navbar />
+            {children}
+          </main>
+        </NextAuthSessionProvider>
       </body>
     </html>
   );
