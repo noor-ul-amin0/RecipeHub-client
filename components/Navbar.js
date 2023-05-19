@@ -13,11 +13,15 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-
+import { signIn } from "next-auth/react";
+import { useRouter, useSelectedLayoutSegment } from "next/navigation";
+import Link from "next/link";
 const pages = ["Categories", "About"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Navbar() {
+  const segment = useSelectedLayoutSegment();
+  const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -30,12 +34,13 @@ function Navbar() {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+    router.push("/about");
   };
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
+  if (segment === "auth") return null;
   return (
     <AppBar
       position="static"
@@ -96,7 +101,7 @@ function Navbar() {
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography sx={{ color: "black" }} textAlign="center">
-                    {page}
+                    <Link href={"/about"}>{page}</Link>
                   </Typography>
                 </MenuItem>
               ))}
@@ -134,7 +139,22 @@ function Navbar() {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Button className="black_btn">Sign in</Button>
+            <Button
+              onClick={() => router.push("/auth/register")}
+              className="nav_auth_btn"
+            >
+              Register
+            </Button>
+          </Box>
+          <Box sx={{ flexGrow: 0 }}>
+            <Button
+              onClick={() => {
+                signIn();
+              }}
+              className="nav_auth_btn"
+            >
+              Sign in
+            </Button>
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
