@@ -11,16 +11,13 @@ export default function SearchBox() {
   };
 
   return (
-    <form
-      onSubmit={handleSearch}
-      className="relative w-full flex-center w-3/5 mt-5"
-    >
+    <form onSubmit={handleSearch} className="relative flex-center w-4/6 mt-5">
       <TextField
         id="outlined-basic"
         fullWidth
         type="search"
         color="secondary"
-        placeholder="Search for a recipe"
+        placeholder="Search a recipe"
         required
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
