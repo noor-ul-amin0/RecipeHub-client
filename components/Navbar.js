@@ -13,13 +13,19 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { signIn } from "next-auth/react";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 const pages = ["Categories", "About"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = [
+  { title: "Profile", redirectTo: "/profile" },
+  { title: "Account", redirectTo: "/account" },
+  { title: "Dashboard", redirectTo: "/dashboard" },
+  { title: "Logout", redirectTo: null },
+];
 
 function Navbar() {
+  const { data: session } = useSession();
   const segment = useSelectedLayoutSegment();
   const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -39,6 +45,13 @@ function Navbar() {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+  const handleUserMenuClick = (title, redirectTo) => {
+    if (title === "Logout") {
+      signOut();
+    } else {
+      router.push(redirectTo);
+    }
   };
   if (segment === "auth") return null;
   return (
@@ -138,53 +151,51 @@ function Navbar() {
             ))}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Button
-              onClick={() => router.push("/auth/register")}
-              className="nav_auth_btn"
-            >
-              Register
-            </Button>
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Button
-              onClick={() => {
-                signIn();
-              }}
-              className="nav_auth_btn"
-            >
-              Sign in
-            </Button>
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Noor" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+          {session === undefined ? null : session?.user ? (
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt={session?.user?.email.toUpperCase()} src="#" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map(({ title, redirectTo }) => (
+                  <MenuItem key={title} onClick={handleCloseUserMenu}>
+                    <Typography
+                      onClick={() => handleUserMenuClick(title, redirectTo)}
+                      textAlign="center"
+                    >
+                      {title}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          ) : (
+            <Box sx={{ flexGrow: 0 }}>
+              <Button
+                onClick={() => router.push("/auth")}
+                className="nav_auth_btn"
+              >
+                Sign in
+              </Button>
+            </Box>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
