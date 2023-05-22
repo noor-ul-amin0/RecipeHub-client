@@ -1,3 +1,5 @@
+import validator from "validator";
+import bcrypt from "bcryptjs";
 import { Schema, model, models } from "mongoose";
 
 const userSchema = new Schema(
@@ -12,10 +14,15 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "Please provide your email"],
-      unique: true,
       lowercase: true,
+      unique: true,
       trim: true,
-      validate: [validator.isEmail, "Please provide a valid email"],
+      validate: {
+        validator: function (v) {
+          return validator.isEmail(v);
+        },
+        message: () => "Please provide a valid email",
+      },
     },
     password: {
       type: String,
@@ -63,6 +70,6 @@ userSchema.statics.findByCredentials = async (email, password) => {
   return user;
 };
 //-------------------------------------------------------------------------------------------------------------
-const User = models.User || model("User", userSchema);
+const User = models?.User || model("User", userSchema);
 
 export default User;
