@@ -13,7 +13,26 @@ export const GET = async (request) => {
     if (!user) {
       return new Response("User not found!", { status: 404 });
     }
-    return new Response(user, { status: 200 });
+    return new Response(JSON.stringify(user), { status: 200 });
+  } catch (error) {
+    return new Response(error, { status: 500 });
+  }
+};
+export const PUT = async (request) => {
+  const { _id, ...rest } = await request.json();
+  if (!_id || !rest) {
+    return new Response(null, { status: 200 });
+  }
+  try {
+    await connectDatabase();
+    const user = await User.findByIdAndUpdate(_id, rest, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) {
+      return new Response("User not found!", { status: 404 });
+    }
+    return new Response(JSON.stringify(user), { status: 200 });
   } catch (error) {
     return new Response(error, { status: 500 });
   }
