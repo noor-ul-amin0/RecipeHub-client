@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { getSession, signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
@@ -35,7 +35,6 @@ function AuthPage(props) {
   }
   useEffect(() => {
     if (session) {
-      // signOut();
       router.replace("/");
     } else {
       setIsLoading(false);
@@ -97,7 +96,7 @@ function AuthPage(props) {
         <Typography component="h1" variant="h5">
           {isLogin ? "Login" : "Register"}
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           {!isLogin && (
             <TextField
               margin="normal"
