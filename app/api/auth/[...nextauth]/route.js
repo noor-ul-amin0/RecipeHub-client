@@ -1,13 +1,12 @@
 // import User from "@/models/user";
-import { verifyPassword } from "@/lib/auth";
-import { connectDatabase } from "@/lib/db";
-import User from "@/models/user";
+import { findUser } from "@/lib/auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
+      type: "credentials",
       // The name to display on the sign in form (e.g. 'Sign in with...')
       name: "Credentials",
       // The credentials is used to generate a suitable form on the sign in page.
@@ -27,21 +26,30 @@ const handler = NextAuth({
         },
       },
       async authorize(credentials) {
-        await connectDatabase();
-        const user = await User.findOne({
-          email: credentials.email,
-        }).select("+password -createdAt -updatedAt");
-        if (
-          !user ||
-          !(await verifyPassword(credentials.password, user.password))
-        ) {
-          throw new Error("Invalid email or password");
+        const response = await fetch(
+          `${process.env.NEXTAUTH_URL}/api/auth/login`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          }
+        );
+        const { success, data, message } = await response.json();
+        if (!response.ok || !success) {
+          throw new Error(message);
         }
-        return user;
+        return data;
       },
     }),
   ],
   callbacks: {
+    async session({ session }) {
+      const user = await findUser({ email: session?.user.email });
+      session.user = user;
+      return session;
+    },
     signIn({ user }) {
       if (user) {
         return true;
