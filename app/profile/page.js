@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import Loader from "@/components/common/stateless/Loader";
 import { useRouter } from "next/navigation";
 import {
   Avatar,
@@ -10,13 +9,14 @@ import {
   Grid,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Button from "@mui/lab/LoadingButton";
+import Loader from "@/components/common/stateless/Loader";
 
 const UserProfile = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
   const [{ fullName, email, profilePic, _id }, setState] = useState({
     profilePic: "",
     fullName: "",
@@ -24,30 +24,21 @@ const UserProfile = () => {
     _id: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    const fetchUserProfile = async (email) => {
-      try {
-        const response = await fetch(`/api/auth/user/profile?email=${email}`);
-        if (!response.ok) {
-          return router.replace("/auth");
-        }
-        const data = await response.json();
-        setState({
-          _id: data._id,
-          profilePic: data.profilePic,
-          fullName: data.fullName,
-          email: data.email,
-        });
-      } catch (error) {
-        alert(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (session?.user?.email) fetchUserProfile(session.user.email);
-  }, [router, session?.user.email]);
+    if (session?.user) {
+      setState({
+        _id: session.user._id,
+        profilePic: session.user.profilePic,
+        fullName: session.user.fullName,
+        email: session.user.email,
+      });
+    }
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [router, session?.user, status]);
   const handleChange = (event) =>
     setState((prevState) => ({
       ...prevState,
@@ -58,19 +49,17 @@ const UserProfile = () => {
     setIsSubmitting(true);
     const data = new FormData(event.currentTarget);
     const fullName = data.get("fullName");
-    const email = data.get("email");
     try {
       const response = await fetch(`/api/auth/user/profile`, {
         method: "PUT",
         body: JSON.stringify({
           _id,
           fullName,
-          email,
         }),
       });
       if (response.ok) {
+        const { data } = await response.json();
         alert("Profile updated successfully");
-        const data = await response.json();
         setState({
           fullName: data.fullName,
           email: data.email,
@@ -82,7 +71,9 @@ const UserProfile = () => {
       setIsSubmitting(false);
     }
   };
-  if (isLoading) return <Loader />;
+  if (status === "loading") {
+    return <Loader />;
+  }
   return (
     <Container component="main" maxWidth="sm" sx={{ mb: 4 }}>
       <Paper
@@ -122,19 +113,24 @@ const UserProfile = () => {
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              required
-              aria-required
-              value={email}
-              onChange={handleChange}
-              type="email"
-              id="email"
-              name="email"
-              label="Email"
-              fullWidth
-              autoComplete="Email Address"
-              variant="standard"
-            />
+            <Tooltip
+              placement="top"
+              title="You can't change your email address"
+            >
+              <TextField
+                required
+                aria-required
+                value={email}
+                disabled
+                type="email"
+                id="email"
+                name="email"
+                label="Email"
+                fullWidth
+                autoComplete="Email Address"
+                variant="standard"
+              />
+            </Tooltip>
           </Grid>
           <Grid item xs={12}>
             <Button
