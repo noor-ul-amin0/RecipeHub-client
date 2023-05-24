@@ -1,39 +1,43 @@
 import { connectDatabase } from "@/lib/db";
 import User from "@/models/user";
+import { Responses } from "@/utils/API_Responses";
+import isEmpty from "lodash/isEmpty";
 
 export const GET = async (request) => {
   const { searchParams } = new URL(request.url);
-  const email = searchParams.get("email");
-  if (!email) {
-    return new Response("Something went wrong", { status: 400 });
-  }
+  const filter = {};
+  searchParams.forEach((value, key) => {
+    filter[key] = value;
+  });
+  if (isEmpty(filter))
+    return Responses._400({ success: false, message: "Something went wrong" });
+
   try {
     await connectDatabase();
-    const user = await User.findOne({ email });
-    if (!user) {
-      return new Response("User not found!", { status: 404 });
-    }
-    return new Response(JSON.stringify(user), { status: 200 });
+    const user = await User.findOne(filter);
+    if (!user)
+      return Responses._404({ success: false, message: "User not found" });
+    return Responses._200({ success: true, data: user });
   } catch (error) {
-    return new Response(error, { status: 500 });
+    return Responses._500({ success: false, message: error.message });
   }
 };
 export const PUT = async (request) => {
   const { _id, ...rest } = await request.json();
-  if (!_id || !rest) {
-    return new Response(null, { status: 200 });
-  }
+  if (!_id || !rest)
+    return Responses._400({ success: false, message: "Missing ID or body" });
+
   try {
     await connectDatabase();
+    delete rest.email;
     const user = await User.findByIdAndUpdate(_id, rest, {
       new: true,
       runValidators: true,
     });
-    if (!user) {
-      return new Response("User not found!", { status: 404 });
-    }
-    return new Response(JSON.stringify(user), { status: 200 });
+    if (!user)
+      return Responses._404({ success: false, message: "User not found" });
+    return Responses._200({ success: true, data: user });
   } catch (error) {
-    return new Response(error, { status: 500 });
+    return Responses._500({ success: false, message: error.message });
   }
 };
