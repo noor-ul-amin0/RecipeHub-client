@@ -41,35 +41,6 @@ const userSchema = new Schema(
   }
 );
 //-------------------------------------------------------------------------------------------------------------
-userSchema.pre("save", async function (next) {
-  const user = this;
-  if (!user.isModified("password")) return next();
-  user.password = await bcrypt.hash(user.password, 12);
-  next();
-});
-//-------------------------------------------------------------------------------------------------------------
-userSchema.methods.confirmPassword = async function (
-  candidatePassword,
-  savePassword
-) {
-  return await bcrypt.compare(candidatePassword, savePassword);
-};
-//-------------------------------------------------------------------------------------------------------------
-userSchema.statics.findByCredentials = async (email, password) => {
-  const user = await User.findOne({
-    email,
-  }).select("+password -createdAt -updatedAt");
-  if (!user) {
-    throw new Error("Invalid email or password");
-  }
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw new Error("Invalid email or password");
-  }
-  delete user.password;
-  return user;
-};
-//-------------------------------------------------------------------------------------------------------------
 const User = models?.User || model("User", userSchema);
 
 export default User;
