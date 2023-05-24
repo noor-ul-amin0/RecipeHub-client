@@ -16,16 +16,18 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-const pages = ["Categories", "About"];
+const pages = [
+  { title: "Categories", path: "/categories" },
+  { title: "About", path: "/about" },
+];
 const settings = [
-  { title: "Profile", redirectTo: "/profile" },
-  { title: "Account", redirectTo: "/account" },
-  { title: "Dashboard", redirectTo: "/dashboard" },
-  { title: "Logout", redirectTo: null },
+  { title: "Profile", path: "/profile" },
+  { title: "Dashboard", path: "/dashboard" },
+  { title: "Logout", path: null },
 ];
 
 function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const segment = useSelectedLayoutSegment();
   const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -40,17 +42,19 @@ function Navbar() {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
-    router.push("/about");
   };
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-  const handleUserMenuClick = (title, redirectTo) => {
+  const handleUserMenuClick = (title, path) => {
     if (title === "Logout") {
-      signOut();
+      signOut({
+        redirect: true,
+        callbackUrl: "/auth",
+      });
     } else {
-      router.push(redirectTo);
+      router.push(path);
     }
   };
   if (segment === "auth") return null;
@@ -67,9 +71,8 @@ function Navbar() {
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="/"
             sx={{
+              cursor: "pointer",
               mr: 2,
               display: { xs: "none", md: "flex" },
               fontFamily: "monospace",
@@ -78,6 +81,7 @@ function Navbar() {
               color: "inherit",
               textDecoration: "none",
             }}
+            onClick={() => router.push("/")}
           >
             RecipeHub
           </Typography>
@@ -111,10 +115,10 @@ function Navbar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+              {pages.map(({ title, path }) => (
+                <MenuItem key={title} onClick={handleCloseNavMenu}>
                   <Typography sx={{ color: "black" }} textAlign="center">
-                    <Link href={"/about"}>{page}</Link>
+                    <Link href={path}>{title}</Link>
                   </Typography>
                 </MenuItem>
               ))}
@@ -140,22 +144,25 @@ function Navbar() {
             RecipeHub
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
+            {pages.map(({ title, path }) => (
               <Button
-                key={page}
+                key={title}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "black", display: "block" }}
               >
-                {page}
+                <Link href={path}>{title}</Link>
               </Button>
             ))}
           </Box>
 
-          {session === undefined ? null : session?.user ? (
+          {status === "loading" ? null : session?.user ? (
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={session?.user?.email.toUpperCase()} src="#" />
+                  <Avatar
+                    alt={session?.user?.fullName.toUpperCase()}
+                    src={session?.user?.profilePic}
+                  />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -174,10 +181,10 @@ function Navbar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map(({ title, redirectTo }) => (
+                {settings.map(({ title, path }) => (
                   <MenuItem key={title} onClick={handleCloseUserMenu}>
                     <Typography
-                      onClick={() => handleUserMenuClick(title, redirectTo)}
+                      onClick={() => handleUserMenuClick(title, path)}
                       textAlign="center"
                     >
                       {title}
