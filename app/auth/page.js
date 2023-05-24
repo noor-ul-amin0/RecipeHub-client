@@ -19,7 +19,7 @@ import Loader from "@/components/common/stateless/Loader";
 import Button from "@mui/lab/LoadingButton";
 
 function AuthPage(props) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(true);
   const [{ isLogin, isLoadingAuth }, setState] = useState({
     isLogin: true,
@@ -57,6 +57,7 @@ function AuthPage(props) {
           redirect: false,
           email,
           password,
+          callbackUrl: "/",
         });
         if (result.error) {
           alert(result.error);
@@ -76,7 +77,7 @@ function AuthPage(props) {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || status === "loading" || session) {
     return <Loader />;
   }
 
