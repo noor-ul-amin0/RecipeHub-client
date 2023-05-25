@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -24,7 +24,7 @@ const UserProfile = () => {
     _id: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
 
   useEffect(() => {
     if (session?.user) {
@@ -59,6 +59,7 @@ const UserProfile = () => {
       });
       if (response.ok) {
         const { data } = await response.json();
+        await update(data);
         alert("Profile updated successfully");
         setState({
           fullName: data.fullName,
@@ -71,6 +72,9 @@ const UserProfile = () => {
       setIsSubmitting(false);
     }
   };
+  const isDirty = useMemo(() => {
+    return fullName.toLowerCase() !== session?.user?.fullName.toLowerCase();
+  }, [fullName, session?.user?.fullName]);
   if (status === "loading") {
     return <Loader />;
   }
@@ -134,6 +138,7 @@ const UserProfile = () => {
           </Grid>
           <Grid item xs={12}>
             <Button
+              disabled={!isDirty}
               loading={isSubmitting}
               loadingIndicator="Loading…"
               className="auth_btn"
