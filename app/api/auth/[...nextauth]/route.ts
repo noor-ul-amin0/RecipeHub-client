@@ -20,7 +20,7 @@ const handler = NextAuth({
           placeholder: "Please enter your password",
         },
       },
-      async authorize(credentials) {
+      async authorize(credentials:Credentials) {
         const response = await fetch(
           `${process.env.NEXTAUTH_URL}/api/auth/signin`,
           {
