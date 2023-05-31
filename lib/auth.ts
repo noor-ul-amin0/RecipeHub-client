@@ -3,8 +3,8 @@ import { hash, compare } from "bcryptjs";
 import { connectDatabase } from "./db";
 import isEmpty from "lodash/isEmpty";
 
-export async function createUser(fullName, email, password) {
-  const response = await fetch("/api/auth/register", {
+export async function signUp(fullName:string, email:string, password:string) {
+  const response = await fetch("/api/auth/signup", {
     method: "POST",
     body: JSON.stringify({ fullName, email, password }),
     headers: {
@@ -25,12 +25,12 @@ export async function findUser(fields = {}) {
   return user;
 }
 
-export async function hashPassword(password) {
+export async function hashPassword(password:string): Promise<string>{
   const hashedPassword = await hash(password, 12);
   return hashedPassword;
 }
 
-export async function verifyPassword(password, hashedPassword) {
+export async function verifyPassword(password:string, hashedPassword:string): Promise<boolean> {
   const isValid = await compare(password, hashedPassword);
   return isValid;
 }
