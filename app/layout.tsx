@@ -1,4 +1,5 @@
-import Navbar from "@/components/common/stateless/Navbar";
+import * as React from "react";
+import Navbar from "@/components/Navbar";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import NextAuthSessionProvider from "@/components/NextAuthSessionProvider";
@@ -14,10 +15,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <NextAuthSessionProvider>
-          <div className="main">
-            <div className="gradient" />
-          </div>
-          <main className="app">
+          <main>
             <Navbar />
             {children}
           </main>
