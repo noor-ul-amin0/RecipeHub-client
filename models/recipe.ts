@@ -1,3 +1,4 @@
+import validator from "validator";
 import { Schema, model, models } from "mongoose";
 
 const recipeSchema = new Schema(
@@ -18,9 +19,15 @@ const recipeSchema = new Schema(
       type: [String],
       required: true,
     },
-    imageUrl: {
+    thumbnail: {
       type: String,
       required: true,
+      validate: {
+        validator: function (v:string) {
+          return validator.isURL(v);
+        },
+        message: () => "Please provide a valid thumbnail url",
+      },
     },
     creator: {
       type: Schema.Types.ObjectId,

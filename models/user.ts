@@ -1,5 +1,4 @@
 import validator from "validator";
-import bcrypt from "bcryptjs";
 import { Schema, model, models } from "mongoose";
 
 const userSchema = new Schema(
@@ -30,7 +29,7 @@ const userSchema = new Schema(
       minlength: 5,
       select: false,
     },
-    profilePic: {
+    avatar: {
       type: String,
       default:
         "https://res.cloudinary.com/plants-era/image/upload/v1608101836/users/default_sntew1.jpg",
