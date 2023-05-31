@@ -3,7 +3,7 @@ import { connectDatabase } from "@/lib/db";
 import User from "@/models/user";
 import { Responses } from "@/utils/API_Responses";
 
-export const POST = async (request) => {
+export const POST = async (request:Request) => {
   const { email, password, fullName } = await request.json();
   if (!email || !password || !fullName) {
     return Responses._400({ success: false, message: "Missing fields" });
@@ -14,7 +14,7 @@ export const POST = async (request) => {
     if (user) {
       return Responses._400({
         success: false,
-        message: "Email already exists!",
+        message: "An account with this email already exists.",
       });
     }
     const hashedPassword = await hashPassword(password);
