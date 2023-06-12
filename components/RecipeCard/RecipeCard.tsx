@@ -17,7 +17,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, description }) => {
     <>
       <Card raised>
         <CardMedia
-          sx={{ height: 160 }}
+          sx={{ height: 220 }}
           image="https://recipehub-bucket.s3.ap-south-1.amazonaws.com/WhippedFetaSandwich_lutzflcat.webp"
           title="green iguana"
         />
