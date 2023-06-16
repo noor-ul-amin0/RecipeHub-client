@@ -7,12 +7,8 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-interface RecipeCardProps {
-  title: string;
-  description: string;
-}
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ title, description }) => {
+const RecipeCard: React.FC<IRecipe> = ({ title, description }) => {
   return (
     <>
       <Card raised>
