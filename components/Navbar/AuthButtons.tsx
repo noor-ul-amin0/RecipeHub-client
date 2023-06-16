@@ -1,18 +1,18 @@
 "use client";
 import * as React from "react";
 import { Button } from "@mui/material";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Session } from "next-auth";
 
-const AuthButtons = () => {
-  const { data: session } = useSession();
+const AuthButtons = ({ session }: { session: Session | null }) => {
   const router = useRouter();
   return (
     <>
       {session?.user ? (
         <Button
           color="inherit"
-          onClick={() => signOut({ callbackUrl: "/signin" })}
+          onClick={() => signOut({ redirect: true, callbackUrl: "/signin" })}
         >
           Logout
         </Button>
