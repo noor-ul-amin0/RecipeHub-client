@@ -2,6 +2,7 @@ import { DialogProps, Dialog, DialogContent } from "@mui/material";
 import { ChangeEvent, FC, FormEvent, useState } from "react";
 import RecipeForm from "../RecipeForm/RecipeForm";
 import { addRecipe } from "@/lib/recipes";
+import { useSession } from "next-auth/react";
 
 interface AddRecipeDialogProps extends DialogProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ interface AddRecipeDialogProps extends DialogProps {
 }
 
 const AddRecipeDialog: FC<AddRecipeDialogProps> = ({ open, onClose }) => {
+  const { data: session } = useSession();
   const [form, setForm] = useState<IRecipeFormData>({
     title: "",
     description: "",
@@ -62,7 +64,7 @@ const AddRecipeDialog: FC<AddRecipeDialogProps> = ({ open, onClose }) => {
     event.preventDefault();
     setIsFormSubmitting(true);
     try {
-      await addRecipe(form);
+      await addRecipe(form, session?.user.accessToken);
       setForm({
         title: "",
         description: "",
