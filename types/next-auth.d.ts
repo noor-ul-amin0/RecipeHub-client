@@ -6,21 +6,27 @@ declare module "next-auth" {
    */
   interface Session {
     user: {
-      _id: string;
-      fullName: string;
+      id: number;
+      full_name: string;
       email: string;
-      avatar: string;
-      createdAt: Date;
-      updatedAt: Date;
-      __v: number;
-    } & DefaultSession["user"]
+      accessToken: string;
+    } & DefaultSession["user"];
   }
   interface Credentials {
-    redirect:    string;
-    email:       string;
-    password:    string;
-    csrfToken:   string;
+    redirect: string;
+    email: string;
+    password: string;
+    csrfToken: string;
     callbackUrl: string;
-    json:        string;
+    json: string;
+  }
 }
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: number;
+    email: string;
+    full_name: string;
+    accessToken: string;
+  }
 }
