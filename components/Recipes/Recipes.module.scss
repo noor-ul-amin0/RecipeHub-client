@@ -2,6 +2,7 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 16px 0;
+  position: relative;
 }
 .row {
   display: grid;
@@ -24,4 +25,11 @@
     grid-gap: 10px;
     margin: 10px;
   }
+}
+.add_button_container {
+  position: -webkit-sticky;
+  position: sticky;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
 }
