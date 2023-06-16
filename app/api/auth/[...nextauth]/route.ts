@@ -1,15 +1,19 @@
-// import User from "@/models/user";
-import { findUser } from "@/lib/auth";
 import NextAuth from "next-auth";
+import { AuthOptions, Session } from "next-auth/core/types";
+import { JWT } from "next-auth/jwt/types";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const handler = NextAuth({
+export const nextAuthOptions: AuthOptions = {
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 2, // 2 days
+  },
   providers: [
     CredentialsProvider({
       type: "credentials",
       name: "Credentials",
       credentials: {
-        username: {
+        email: {
           label: "Email",
           type: "email",
           placeholder: "Please enter your email",
@@ -20,17 +24,17 @@ const handler = NextAuth({
           placeholder: "Please enter your password",
         },
       },
-      async authorize(credentials:Credentials) {
-        const response = await fetch(
-          `${process.env.NEXTAUTH_URL}/api/auth/signin`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-          }
-        );
+      async authorize(credentials: Credentials) {
+        const response = await fetch(`http://localhost:8080/api/users/signin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+        });
         const { success, data, message } = await response.json();
         if (!response.ok || !success) {
           throw new Error(message);
@@ -40,22 +44,28 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async session({ session }) {
-      const user = await findUser({ email: session?.user.email });
-      session.user = user;
+    jwt: async ({ token, user }): Promise<JWT> => {
+      if (user) {
+        token.email = user.email;
+        token.full_name = user.full_name;
+        token.id = user.id;
+        token.accessToken = user.token;
+      }
+
+      return token;
+    },
+    async session({ session, token }): Promise<Session> {
+      if (token) {
+        session.user.id = token.id;
+        session.user.email = token.email;
+        session.user.full_name = token.full_name;
+        session.user.accessToken = token.accessToken;
+      }
       return session;
     },
-    signIn({ user }) {
-      if (user) {
-        return true;
-      } else {
-        // Return false to display a default error message
-        return false;
-        // Or you can return a URL to redirect to:
-        // return '/unauthorized'
-      }
-    },
   },
-});
+};
+
+const handler = NextAuth(nextAuthOptions);
 
 export { handler as GET, handler as POST };
