@@ -1,8 +1,9 @@
+import { useSearchRecipesStore } from "@/store/recipe";
 import styled from "@emotion/styled";
 import SearchIcon from "@mui/icons-material/Search";
 import { ThemeProvider, alpha, createTheme } from "@mui/material";
 import InputBase from "@mui/material/InputBase";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -45,11 +46,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const theme = createTheme();
 
 const SearchBox = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const query = useSearchRecipesStore((state) => state.query);
+  const setQuery = useSearchRecipesStore((state) => state.setQuery);
 
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    // Perform search operation here based on the searchQuery value
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
   };
   return (
     <ThemeProvider theme={theme}>
@@ -58,9 +59,9 @@ const SearchBox = () => {
           <SearchIcon />
         </SearchIconWrapper>
         <StyledInputBase
-          onChange={handleSearchChange}
+          onChange={handleInputChange}
           type="search"
-          value={searchQuery}
+          value={query}
           placeholder="Search…"
           inputProps={{ "aria-label": "search" }}
         />
