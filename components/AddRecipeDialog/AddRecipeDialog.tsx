@@ -3,6 +3,7 @@ import { ChangeEvent, FC, FormEvent, useState } from "react";
 import RecipeForm from "../RecipeForm/RecipeForm";
 import { addRecipe } from "@/lib/recipes";
 import { useSession } from "next-auth/react";
+import { useRecipesStore } from "@/store/recipe";
 
 interface AddRecipeDialogProps extends DialogProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ interface AddRecipeDialogProps extends DialogProps {
 
 const AddRecipeDialog: FC<AddRecipeDialogProps> = ({ open, onClose }) => {
   const { data: session } = useSession();
+  const unshiftRecipe = useRecipesStore((state) => state.addRecipe);
   const [form, setForm] = useState<IRecipeFormData>({
     title: "",
     description: "",
@@ -64,7 +66,7 @@ const AddRecipeDialog: FC<AddRecipeDialogProps> = ({ open, onClose }) => {
     event.preventDefault();
     setIsFormSubmitting(true);
     try {
-      await addRecipe(form, session?.user.accessToken);
+      const recipe = await addRecipe(form, session?.user.accessToken);
       setForm({
         title: "",
         description: "",
@@ -72,6 +74,7 @@ const AddRecipeDialog: FC<AddRecipeDialogProps> = ({ open, onClose }) => {
         directions: [""],
       });
       alert("Recipe added successfully");
+      unshiftRecipe(recipe);
       onClose();
     } catch (error) {
       alert(error);
