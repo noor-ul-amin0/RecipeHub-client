@@ -1,11 +1,17 @@
-export const getAllRecipes = async (accessToken: string | any) => {
+export const getAllRecipes = async (
+  accessToken: string | any,
+  searchTerm?: string | any
+) => {
+  const getRecipesURL = "http://localhost:8080/api/recipes";
   const bearerToken = accessToken && `Bearer ${accessToken}`;
-  const response = await fetch(`http://localhost:8080/api/recipes`, {
+  const url = searchTerm
+    ? `${getRecipesURL}?search=${encodeURIComponent(searchTerm)}`
+    : getRecipesURL;
+  const response = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       Authorization: bearerToken,
     },
-    cache: "no-store",
   });
   const { data, success, message } = await response.json();
   if (!response.ok || !success) {
