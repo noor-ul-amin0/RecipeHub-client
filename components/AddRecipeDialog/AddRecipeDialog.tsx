@@ -4,6 +4,7 @@ import RecipeForm from "../RecipeForm/RecipeForm";
 import { addRecipe } from "@/lib/recipes";
 import { useSession } from "next-auth/react";
 import { useRecipesStore } from "@/store/recipe";
+import { useSnackbarStore } from "@/store/snackbar";
 
 interface AddRecipeDialogProps extends DialogProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ interface AddRecipeDialogProps extends DialogProps {
 }
 
 const AddRecipeDialog: FC<AddRecipeDialogProps> = ({ open, onClose }) => {
+  const { showAlert } = useSnackbarStore();
   const { data: session } = useSession();
   const unshiftRecipe = useRecipesStore((state) => state.addRecipe);
   const [form, setForm] = useState<IRecipeFormData>({
@@ -73,11 +75,11 @@ const AddRecipeDialog: FC<AddRecipeDialogProps> = ({ open, onClose }) => {
         ingredients: [""],
         directions: [""],
       });
-      alert("Recipe added successfully");
+      showAlert("success", "Recipe added successfully");
       unshiftRecipe(recipe);
       onClose();
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      showAlert("error", error.message);
     } finally {
       setIsFormSubmitting(false);
     }
