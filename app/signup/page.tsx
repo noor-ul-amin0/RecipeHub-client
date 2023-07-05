@@ -7,8 +7,10 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { signUp } from "@/lib/auth";
+import { useSnackbarStore } from "@/store/snackbar";
 
 const SignUp = () => {
+  const { showAlert } = useSnackbarStore();
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,10 +31,10 @@ const SignUp = () => {
       const password = data.get("password");
       const email = data.get("email");
       await signUp(fullName, email, password);
-      alert("You're successed signed up! Please sign in.");
+      showAlert("success", "Account created successfully!");
       router.replace("/signin");
     } catch (error: any) {
-      alert(error.message);
+      showAlert("error", error.message);
     } finally {
       setIsSubmitting(false);
     }
