@@ -10,6 +10,9 @@ const Recipes: FC<{ recipes: IRecipe[] }> = ({ recipes = [] }) => {
         <AddRecipe />
       </div>
       <div className={styles.row}>
+        {!recipes.length && (
+          <p className={styles.no_recipes}>No recipes found</p>
+        )}
         {recipes.map((recipe) => (
           <RecipeCard key={recipe.id} {...recipe} />
         ))}

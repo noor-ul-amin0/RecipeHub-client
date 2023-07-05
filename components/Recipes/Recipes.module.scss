@@ -35,3 +35,15 @@
   margin-bottom: 10px;
   z-index: 100;
 }
+.no_recipes {
+  text-align: center;
+  color: #888;
+  font-size: 18px;
+  padding: 20px;
+  margin: 10px auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 300px; /* Adjust the width to your preference */
+  background-color: #f2f2f2; /* Add a background color if needed */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
