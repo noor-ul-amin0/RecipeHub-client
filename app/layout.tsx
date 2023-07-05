@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import NextAuthSessionProvider from "@/components/NextAuthSessionProvider";
 import { Metadata } from "next";
+import Snackbar from "@/components/Snackbar/Snackbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <Snackbar />
         <NextAuthSessionProvider>
           <main>
             <Navbar />
