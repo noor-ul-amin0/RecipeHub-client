@@ -4,16 +4,20 @@ import { Button } from "@mui/material";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Session } from "next-auth";
+import { useSnackbarStore } from "@/store/snackbar";
 
 const AuthButtons = ({ session }: { session: Session | null }) => {
+  const { showAlert } = useSnackbarStore();
   const router = useRouter();
+  const signOutUser = () => {
+    signOut({ redirect: true, callbackUrl: "/signin" }).then(() =>
+      showAlert("success", "Logged out successfully")
+    );
+  };
   return (
     <>
       {session?.user ? (
-        <Button
-          color="inherit"
-          onClick={() => signOut({ redirect: true, callbackUrl: "/signin" })}
-        >
+        <Button color="inherit" onClick={signOutUser}>
           Logout
         </Button>
       ) : (
