@@ -6,8 +6,10 @@ import Button from "@mui/lab/LoadingButton";
 import { SignInResponse, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSnackbarStore } from "@/store/snackbar";
 
 const SignIn = () => {
+  const { showAlert } = useSnackbarStore();
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,8 +33,11 @@ const SignIn = () => {
       password,
     });
     if (result?.error) {
-      alert(result?.error);
-    } else router.replace("/");
+      showAlert("error", result?.error);
+    } else {
+      showAlert("success", "Signed in successfully");
+      router.replace("/");
+    }
     setIsSubmitting(false);
   };
   if (loadingSession || status === "loading" || session) {
