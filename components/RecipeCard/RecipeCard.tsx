@@ -7,11 +7,17 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 
-const RecipeCard: React.FC<IRecipe> = ({ title, description }) => {
+const RecipeCard: React.FC<IRecipe> = ({ title, slug, description }) => {
+  const router = useRouter();
   return (
     <>
-      <Card raised>
+      <Card
+        raised
+        sx={{ cursor: "pointer" }}
+        onClick={() => router.push(`/recipe/${slug}`)}
+      >
         <CardMedia
           sx={{ height: 220 }}
           image="https://recipehub-bucket.s3.ap-south-1.amazonaws.com/WhippedFetaSandwich_lutzflcat.webp"
