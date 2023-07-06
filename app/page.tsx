@@ -6,8 +6,10 @@ import { FC, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
 import { useRecipesStore, useSearchRecipesStore } from "@/store/recipe";
+import { useSnackbarStore } from "@/store/snackbar";
 
 const Home: FC = () => {
+  const { showAlert } = useSnackbarStore();
   const router = useRouter();
   const { status, data: session } = useSession({
     required: true,
@@ -23,8 +25,8 @@ const Home: FC = () => {
     try {
       const recipes = await getAllRecipes(session?.user.accessToken, query);
       setRecipes(recipes);
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+      showAlert("error", error.message);
     }
   };
 
