@@ -16,6 +16,7 @@
 /build
 
 # misc
+code_snippits
 .DS_Store
 *.pem
 
