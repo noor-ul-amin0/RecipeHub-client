@@ -37,7 +37,18 @@ const Home: FC = () => {
   if (status === "loading") return <Loader />;
   return (
     <>
-      <Recipes recipes={recipes} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingTop: "30px",
+          border: "3px solid yellow",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <Recipes recipes={recipes} />
+      </div>
     </>
   );
 };
